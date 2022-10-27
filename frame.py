@@ -2,6 +2,7 @@ import os
 import face_recognition
 import pickle
 import boto3
+import csv
 # video_location ="D:\\Cloud_Computing\\cse546-project-lambda\\test_cases\\test_case_1\\test_7.mp4"
 # path = "D:\\Cloud_Computing\\CSE546_Project2\\"
 # image_path="D:\\Cloud_Computing\\CSE546_Project2\\test_7.jpg"
@@ -13,9 +14,9 @@ def lambda_handler(event, context):
     video_location = "/home/app/" + key #location inside docker container will be /home/app/
     image_path = extract_frame(video_location)
     face_name = recognition(image_path)
-    ##dynamodb function
-    ##csv creation function
-    uploads3("testfacerecogoutput",csv_name)
+    csv_file_name = createCSV(key,face_name)
+    csv_file_name = "/home/app/" + csv_file_name
+    uploads3("testfacerecogoutput",csv_file_name)
 
 def downloads3(s3_bucket_name, video_name):
     session = boto3.session.Session()
@@ -31,6 +32,7 @@ def extract_frame(video_location):
     file_name = file_name + ".jpg"
     os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(path) + file_name)
     image_path = os.path.abspath(file_name)
+    print(image_path)
     return image_path
 
 
@@ -52,7 +54,39 @@ def recognition(image_path):
     for res in result:
         if res:
             idx=result.index(res)
-            print(face_names[idx]) ##add return statement
+            return(face_names[idx]) ##add return statement
+
+def query_db(name):
+    dynamodb_client = boto3.client('dynamodb')
+    response = dynamodb_client.get_item(
+        TableName="Project2",
+        Key={
+            'name': {'S': name}
+        }
+    )
+    print(response['Item'])
+    return (response['Item'])
+
+
+def createCSV(videoName, face_name):
+    video_name = videoName.rsplit(".",1)[0]
+    file_name = video_name + ".csv"
+    with open(file_name, "w") as f:
+        writer = csv.writer(f)
+        student_data = query_db(face_name)
+        name = student_data['name']['S']
+        major = student_data['major']['S']
+        year = student_data['year']['S']
+        writer.writerow([name, major, year])
+    print(os.path.isfile("/home/app/"+ file_name))
+    return file_name
+
+
+def uploads3(s3_bucket_name, file_name):
+    file_name = file_name + ".csv"
+    s3_client = boto3.client("s3")
+    s3_client.upload_file(file_name, s3_bucket_name, file_name)
+
 
 def uploads3(s3_bucket_name,csv_name):
     file_name = "/home/app/" + csv_name
