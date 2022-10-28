@@ -85,7 +85,7 @@ def createCSV(videoName, face_name):
 
 
 def uploads3(s3_bucket_name,csv_name):
-    file_name = "/tmp/" + csv_name
+    file_name = csv_name
     s3 = boto3.resource("s3")
     bucket = s3.Bucket(s3_bucket_name)
     response = bucket.upload_file(file_name, csv_name)
