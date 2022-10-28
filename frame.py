@@ -81,7 +81,7 @@ def createCSV(videoName, face_name):
         major = student_data['major']['S']
         year = student_data['year']['S']
         writer.writerow([name, major, year])
-    print(os.path.isfile("/tmp/"+ file_name))
+    print(os.path.isfile(file_name))
     return file_name
 
 
