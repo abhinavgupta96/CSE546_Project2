@@ -33,7 +33,7 @@ def extract_frame(video_location):
     path = "/tmp/"
     os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(path) + file_name)
     print(os.path.isfile("/tmp/"+ file_name))
-    image_path = os.path.abspath(file_name)
+    image_path = "/tmp/" + file_name
     print(image_path)
     return image_path
 
