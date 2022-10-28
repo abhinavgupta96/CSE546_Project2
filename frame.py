@@ -73,8 +73,8 @@ def query_db(name):
 
 def createCSV(videoName, face_name):
     video_name = videoName.rsplit(".",1)[0]
-    file_name = video_name + ".csv"
-    with open(file_name, "w") as f:
+    file_name = "/tmp/" + video_name + ".csv"
+    with open(file_name, 'a') as f:
         writer = csv.writer(f)
         student_data = query_db(face_name)
         name = student_data['name']['S']
