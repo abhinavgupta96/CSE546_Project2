@@ -59,7 +59,7 @@ RUN apt-get install -y ffmpeg
 COPY requirements.txt ${FUNCTION_DIR}
 RUN python${RUNTIME_VERSION} -m pip install -r requirements.txt --target ${FUNCTION_DIR}
 COPY entry.sh /
-COPY encoding.dat /
+COPY encoding.dat /home/app/
 
 # Copy function code
 COPY frame.py ${FUNCTION_DIR}
