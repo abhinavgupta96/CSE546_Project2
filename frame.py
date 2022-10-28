@@ -30,7 +30,7 @@ def extract_frame(video_location):
     file_name = file_name + ".jpeg"
     print(file_name)
     path = "/tmp/"
-    os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(path) + file_name)
+    os.system("ffmpeg -i " + str(video_location) + " -vframes 1 " + str(path) + file_name)
     print(os.path.isfile("/tmp/"+ file_name))
     image_path = "/tmp/" + file_name
     print(image_path)
@@ -87,8 +87,8 @@ def createCSV(videoName, face_name):
 
 def uploads3(s3_bucket_name,csv_name):
     print("Entering S3 upload")
-    file_name = csv_name
+    object_name = csv_name.rsplit("/")[2]
     s3 = boto3.resource("s3")
     bucket = s3.Bucket(s3_bucket_name)
-    response = bucket.upload_file(file_name, csv_name)
+    bucket.upload_file(csv_name,object_name)
     print("File uploaded")
