@@ -13,7 +13,6 @@ def lambda_handler(event, context):
     image_path = extract_frame(video_location)
     face_name = recognition(image_path)
     csv_file_name = createCSV(key,face_name)
-    csv_file_name = "/tmp/" + csv_file_name
     uploads3("outputface",csv_file_name)
 
 def downloads3(s3_bucket_name, video_name):
