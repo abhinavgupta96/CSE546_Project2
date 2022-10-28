@@ -71,6 +71,7 @@ def query_db(name):
 
 
 def createCSV(videoName, face_name):
+    print("Entering CSV creation")
     video_name = videoName.rsplit(".",1)[0]
     file_name = "/tmp/" + video_name + ".csv"
     with open(file_name, 'a') as f:
@@ -85,6 +86,7 @@ def createCSV(videoName, face_name):
 
 
 def uploads3(s3_bucket_name,csv_name):
+    print("Entering S3 upload")
     file_name = csv_name
     s3 = boto3.resource("s3")
     bucket = s3.Bucket(s3_bucket_name)
