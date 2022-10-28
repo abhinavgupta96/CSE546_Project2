@@ -3,37 +3,36 @@ import face_recognition
 import pickle
 import boto3
 import csv
-# video_location ="D:\\Cloud_Computing\\cse546-project-lambda\\test_cases\\test_case_1\\test_7.mp4"
-# path = "D:\\Cloud_Computing\\CSE546_Project2\\"
-# image_path="D:\\Cloud_Computing\\CSE546_Project2\\test_7.jpg"
+
 
 def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     downloads3(bucket,key)
-    video_location = "/home/app/" + key #location inside docker container will be /home/app/
+    video_location = "/tmp/" + key
     image_path = extract_frame(video_location)
     face_name = recognition(image_path)
     csv_file_name = createCSV(key,face_name)
-    csv_file_name = "/home/app/" + csv_file_name
+    csv_file_name = "/tmp/" + csv_file_name
     uploads3("testfacerecogoutput",csv_file_name)
 
 def downloads3(s3_bucket_name, video_name):
     session = boto3.session.Session()
     s3_resource = session.resource("s3")
-    file_name = "/home/app/" + video_name #location inside docker container will be /home/app/
+    file_name = "/tmp/" + video_name #location inside docker container will be /home/app/
     s3_resource.meta.client.download_file(s3_bucket_name,video_name,file_name)
 
 def extract_frame(video_location):
     ##video_location is directory where videos are stored
     ##path is place where image will be downloaded
     video_name = video_location.rsplit(".",1)[0]
-    file_name = video_name.rsplit("/")[3]
+    file_name = video_name.rsplit("/")[2]
     file_name = file_name + ".jpg"
     os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(video_location) + file_name)
     image_path = os.path.abspath(file_name)
     print(image_path)
     return image_path
+
 
 
 def recognition(image_path):
@@ -78,7 +77,7 @@ def createCSV(videoName, face_name):
         major = student_data['major']['S']
         year = student_data['year']['S']
         writer.writerow([name, major, year])
-    print(os.path.isfile("/home/app/"+ file_name))
+    print(os.path.isfile("/tmp/"+ file_name))
     return file_name
 
 
@@ -89,7 +88,7 @@ def uploads3(s3_bucket_name, file_name):
 
 
 def uploads3(s3_bucket_name,csv_name):
-    file_name = "/home/app/" + csv_name
+    file_name = "/tmp/" + csv_name
     s3 = boto3.resource("s3")
     bucket = s3.Bucket(s3_bucket_name)
     response = bucket.upload_file(file_name, csv_name)
