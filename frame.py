@@ -30,7 +30,7 @@ def extract_frame(video_location):
     video_name = video_location.rsplit(".",1)[0]
     file_name = video_name.rsplit("/")[3]
     file_name = file_name + ".jpg"
-    os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(path) + file_name)
+    os.system("ffmpeg -i " + str(video_location) + " -update 1 " + str(video_location) + file_name)
     image_path = os.path.abspath(file_name)
     print(image_path)
     return image_path
